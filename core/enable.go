@@ -16,7 +16,6 @@ func Enable(rootDir, accountToken, description string) string {
 	if err := root.SetEnvironment(&env_core.Environment{
 		AccountToken: accountToken,
 		ApiEndpoint:  apiEndpoint,
-		Host:         "android",
 		Description:  description,
 	}); err != nil {
 		return jerr(err)
@@ -31,7 +30,6 @@ func Enable(rootDir, accountToken, description string) string {
 		AccountToken: accountToken,
 		ZitiIdentity: env.ZitiIdentity,
 		ApiEndpoint:  apiEndpoint,
-		Host:         "android",
 		Description:  description,
 	}); err != nil {
 		return jerr(err)

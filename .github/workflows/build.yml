@@ -30,6 +30,7 @@ jobs:
           cd core
           go get github.com/openziti/zrok/v2@latest
           go mod tidy
+          go get golang.org/x/mobile@latest
           gomobile bind -androidapi 26 -target=android -o ../app/libs/zrokcore.aar .
       - name: Build APK
         run: |

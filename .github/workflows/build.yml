@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.23'
+          go-version: '1.26'
       - uses: nttld/setup-ndk@v1
         id: ndk
         with:
@@ -28,7 +28,6 @@ jobs:
           export PATH=$(go env GOPATH)/bin:$PATH
           gomobile init
           cd core
-          go get github.com/openziti/zrok/v2@latest
           go mod tidy
           go get golang.org/x/mobile@latest
           gomobile bind -androidapi 26 -target=android -o ../app/libs/zrokcore.aar .

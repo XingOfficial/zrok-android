@@ -1,0 +1,43 @@
+name: build
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - uses: nttld/setup-ndk@v1
+        id: ndk
+        with:
+          ndk-version: r26d
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Build AAR (gomobile)
+        env:
+          ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          go install golang.org/x/mobile/cmd/gobind@latest
+          export PATH=$(go env GOPATH)/bin:$PATH
+          gomobile init
+          cd core
+          go get github.com/openziti/zrok/v2@latest
+          go mod tidy
+          gomobile bind -androidapi 26 -target=android -o ../app/libs/zrokcore.aar .
+      - name: Build APK
+        run: |
+          echo sdk.dir=$ANDROID_HOME >> local.properties
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: zrok-android-apk
+          path: app/build/outputs/apk/release/app-release.apk

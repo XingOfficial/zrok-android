@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"time"
 	"github.com/openziti/sdk-golang/ziti"
-	"github.com/openziti/zrok/v2/environment"
-	"github.com/openziti/zrok/v2/sdk/golang/sdk"
+	"github.com/openziti/zrok/environment"
+	"github.com/openziti/zrok/sdk/golang/sdk"
 	"golang.org/x/sys/unix"
 )
 type tunnelInfo struct {

@@ -152,7 +152,7 @@ func recvFD(c *net.UnixConn) (int, error) {
 		return -1, err
 	}
 	for _, scm := range scms {
-		fds, err := unix.ParseRights(scm)
+		fds, err := unix.ParseUnixRights(&scm)
 		if err != nil {
 			continue
 		}

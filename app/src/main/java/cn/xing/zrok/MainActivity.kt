@@ -1,5 +1,8 @@
 package cn.xing.zrok
 import android.content.Intent
+import android.net.Uri
+import android.os.Environment
+import android.provider.Settings
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -55,9 +58,18 @@ fun LoginScreen(rootDir: String, onToken: (String) -> Unit, onDone: (String) -> 
     }, label = { Text("Account Token") }, modifier = Modifier.fillMaxWidth())
     Spacer(Modifier.height(12.dp))
     Button(enabled = !busy, onClick = {
-        busy = true
-        onDone(zrokcore.Zrokcore.enable(rootDir, token, "android-app"))
-        busy = false
+        if (!Environment.isExternalStorageManager()) {
+            try {
+                startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    Uri.parse("package:cn.xing.zrok")))
+            } catch (e: Exception) {
+                startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+            }
+        } else {
+            busy = true
+            onDone(zrokcore.Zrokcore.enable(rootDir, token, "android-app"))
+            busy = false
+        }
     }) { Text(if (busy) "启用中…" else "启用环境") }
 }
 @Composable
@@ -131,7 +143,7 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
             modifier = Modifier.width(120.dp))
         Spacer(Modifier.width(8.dp))
         Button(onClick = {
-            val sock = "zrok-acc-" + accToken
+            val sock = rootDir + "/acc-" + accToken
             Fwd.nativeStart(accPort.toInt(), sock)
             onLog(zrokcore.Zrokcore.startAccess(rootDir, accToken, sock, accPort.toLong()))
         }) { Text("接入") }

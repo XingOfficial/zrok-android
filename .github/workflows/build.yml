@@ -33,6 +33,7 @@ jobs:
           go get golang.org/x/sys@v0.48.0
           go get -tool golang.org/x/mobile/cmd/gobind
           go mod tidy
+          mkdir -p ../app/libs app/libs
           gomobile bind -androidapi 26 -target=android -o ../app/libs/zrokcore.aar .
       - name: Build APK
         run: |

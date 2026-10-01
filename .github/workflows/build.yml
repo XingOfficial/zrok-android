@@ -44,6 +44,20 @@ jobs:
           echo sdk.dir=$ANDROID_HOME >> local.properties
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
+      - name: Sign APK
+        env:
+          KS_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          echo "$KS_B64" | base64 -d > keystore.p12
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | tail -1)
+          APK=$(find app/build/outputs/apk -name '*.apk' | head -1)
+          echo "signing: $APK"
+          "$BT/zipalign" -f 4 "$APK" /tmp/aligned.apk
+          "$BT/apksigner" sign --ks-type PKCS12 --ks keystore.p12 --ks-key-alias "$KS_ALIAS" --ks-pass "pass:$KS_PASS" --out "$APK" /tmp/aligned.apk
+
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

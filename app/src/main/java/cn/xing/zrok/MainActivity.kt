@@ -56,7 +56,7 @@ fun LoginScreen(rootDir: String, onToken: (String) -> Unit, onDone: (String) -> 
     Spacer(Modifier.height(12.dp))
     Button(enabled = !busy, onClick = {
         busy = true
-        onDone(zrokcore.Core.enable(rootDir, token, "android-app"))
+        onDone(zrokcore.Zrokcore.Enable(rootDir, token, "android-app"))
         busy = false
     }) { Text(if (busy) "启用中…" else "启用环境") }
 }
@@ -68,7 +68,7 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
     var accToken by remember { mutableStateOf("") }
     var accPort by remember { mutableStateOf("9443") }
     fun refresh() {
-        val ov = JSONObject(zrokcore.Core.overview(token))
+        val ov = JSONObject(zrokcore.Zrokcore.Overview(token))
         if (ov.optBoolean("ok")) {
             val rows = mutableListOf<ShareRow>()
             val envs = ov.optJSONObject("data")?.optJSONArray("environments") ?: JSONArray()
@@ -87,7 +87,7 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
     }
     LaunchedEffect(Unit) {
         while (true) {
-            val st = JSONObject(zrokcore.Core.stats())
+            val st = JSONObject(zrokcore.Zrokcore.Stats())
             if (st.optBoolean("ok")) {
                 val arr = st.optJSONArray("data") ?: JSONArray()
                 tunnels = (0 until arr.length()).map { arr.getJSONObject(it) }
@@ -108,10 +108,10 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
                 Text(s.desc, style = MaterialTheme.typography.bodySmall)
                 Row {
                     TextButton(onClick = {
-                        onLog(zrokcore.Core.startHost(rootDir, s.shareToken, s.desc))
+                        onLog(zrokcore.Zrokcore.StartHost(rootDir, s.shareToken, s.desc))
                     }) { Text("开隧道") }
                     TextButton(onClick = {
-                        onLog(zrokcore.Core.deleteShare(token, s.envZId, s.shareToken))
+                        onLog(zrokcore.Zrokcore.DeleteShare(token, s.envZId, s.shareToken))
                         refresh()
                     }) { Text("删除", color = MaterialTheme.colorScheme.error) }
                 }
@@ -133,7 +133,7 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
         Button(onClick = {
             val sock = "zrok-acc-" + accToken
             Fwd.nativeStart(accPort.toInt(), sock)
-            onLog(zrokcore.Core.startAccess(rootDir, accToken, sock, accPort.toInt()))
+            onLog(zrokcore.Zrokcore.StartAccess(rootDir, accToken, sock, accPort.toInt()))
         }) { Text("接入") }
     }
     Spacer(Modifier.height(12.dp))
@@ -146,7 +146,7 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
                 Text("↑${t.optLong("tx") / 1024}KB ↓${t.optLong("rx") / 1024}KB 连接:${t.optInt("conns")}")
                 if (t.optString("lastError").isNotEmpty()) Text(t.optString("lastError"),
                     color = MaterialTheme.colorScheme.error)
-                TextButton(onClick = { onLog(zrokcore.Core.stop(t.optString("id"))) }) { Text("停止") }
+                TextButton(onClick = { onLog(zrokcore.Zrokcore.Stop(t.optString("id"))) }) { Text("停止") }
             }
         }
     }
@@ -164,7 +164,7 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
             },
             confirmButton = {
                 TextButton(onClick = {
-                    onLog(zrokcore.Core.createShare(token, envZId, target.trim(), uname.trim()))
+                    onLog(zrokcore.Zrokcore.CreateShare(token, envZId, target.trim(), uname.trim()))
                     dlgFor = null; refresh()
                 }) { Text("创建") }
             },

@@ -34,7 +34,11 @@ jobs:
           go get -tool golang.org/x/mobile/cmd/gobind
           go mod tidy
           mkdir -p ../app/libs app/libs
-          gomobile bind -javapkg=zrokcore -androidapi 26 -target=android -o ../app/libs/zrokcore.aar .
+          gomobile bind -androidapi 26 -target=android -o ../app/libs/zrokcore.aar .
+          AAR=$(find .. -name "*.aar" | head -1)
+          echo "=== AAR: $AAR ==="
+          unzip -o "$AAR" classes.jar -d /tmp/aardump
+          unzip -l /tmp/aardump/classes.jar | grep -E "\.class|\.java" | head -40
       - name: Build APK
         run: |
           echo sdk.dir=$ANDROID_HOME >> local.properties

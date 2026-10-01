@@ -132,7 +132,7 @@ fun MainScreen(rootDir: String, token: String, onLog: (String) -> Unit) {
         Spacer(Modifier.width(8.dp))
         Button(onClick = {
             val sock = "zrok-acc-" + accToken
-            Fwd.nativeStart(accPort.toLong(), sock)
+            Fwd.nativeStart(accPort.toInt(), sock)
             onLog(zrokcore.Zrokcore.startAccess(rootDir, accToken, sock, accPort.toLong()))
         }) { Text("接入") }
     }

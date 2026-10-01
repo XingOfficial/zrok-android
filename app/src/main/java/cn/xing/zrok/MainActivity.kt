@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.*
 import org.json.JSONArray
@@ -51,6 +52,7 @@ fun App(rootDir: String) {
 fun LoginScreen(rootDir: String, onToken: (String) -> Unit, onDone: (String) -> Unit) {
     var token by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }
+    val ctx = LocalContext.current
     Text("zrok 登录", style = MaterialTheme.typography.headlineSmall)
     Spacer(Modifier.height(12.dp))
     OutlinedTextField(value = token, onValueChange = {
@@ -60,10 +62,10 @@ fun LoginScreen(rootDir: String, onToken: (String) -> Unit, onDone: (String) -> 
     Button(enabled = !busy, onClick = {
         if (!Environment.isExternalStorageManager()) {
             try {
-                startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                ctx.startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
                     Uri.parse("package:cn.xing.zrok")))
             } catch (e: Exception) {
-                startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+                ctx.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
             }
         } else {
             busy = true
